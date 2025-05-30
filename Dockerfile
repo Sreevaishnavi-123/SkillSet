@@ -1,29 +1,35 @@
-# Stage 1: Build Frontend
+
 FROM node:18 AS frontend-build
 WORKDIR /app/client
-COPY client/package.json client/package-lock.json ./
+COPY client/package*.json ./s
 RUN npm install
 COPY client ./
 RUN npm run build
 
-# Stage 2: Build Backend
-FROM node:18 AS backend
+
+FROM node:18 AS backend-build
 WORKDIR /app/server
-COPY server/package.json server/package-lock.json ./
+COPY server/package*.json ./
 RUN npm install
 COPY server ./
 
-# Stage 3: Final Image
-FROM node:18
+FROM node:18-slim
+
+
 WORKDIR /app
-# Copy frontend build
+RUN useradd -m appuser
+
 COPY --from=frontend-build /app/client/dist ./client/dist
-# Copy backend
-COPY --from=backend /app/server ./server
-# Serve frontend from backend
+
+COPY --from=backend-build /app/server ./server
+
+RUN chown -R appuser:appuser /app
+
+USER appuser
+
 WORKDIR /app/server
 RUN npm install --only=production
-# Expose port
+
+
 EXPOSE 5000
-# Start the backend server
 CMD ["node", "server.js"]
