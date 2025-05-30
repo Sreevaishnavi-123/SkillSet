@@ -7,13 +7,13 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const app = express();
+app.disable('x-powered-by');
 const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = ['http://localhost:3000'];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // allow requests with no origin (like Postman, curl)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
