@@ -19,7 +19,7 @@ FROM node:18-slim
 WORKDIR /app
 RUN useradd -m appuser
 
-COPY --from=frontend-build /app/client/dist ./client/dist
+COPY --from=frontend-build /app/client/build ./client/dist
 
 COPY --from=backend-build /app/server ./server
 
