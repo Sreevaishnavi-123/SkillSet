@@ -1,0 +1,93 @@
+trigger:
+  - main
+
+pool:
+  name: ganga
+  demands:
+    - Agent.Name -equals ganga123
+
+variables:
+  frontend-dir: 'client'
+  backend-dir: 'server'
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '18.x'
+    displayName: 'Install Node.js'
+
+  - script: |
+      cd $(frontend-dir)
+      npm install
+    displayName: 'Install Frontend Dependencies'
+
+  - script: |
+      cd $(frontend-dir)
+      npm run build
+    displayName: 'Build React App'
+
+  - script: |
+      cd $(backend-dir)
+      npm install
+    displayName: 'Install Backend Dependencies'
+
+  - task: SonarQubePrepare@5
+    inputs:
+      SonarQube: 'sonar'  # Must match the Service Connection name in Azure DevOps
+      scannerMode: 'CLI'
+      configMode: 'manual'
+      cliProjectKey: 'SkillSet'
+      cliProjectName: 'SkillSet'
+      cliSources: '.'  
+      extraProperties: |
+        sonar.language=js
+        sonar.sourceEncoding=UTF-8
+        sonar.exclusions=**/node_modules/**,**/*.test.js,**/*.spec.js
+    displayName: 'Prepare SonarQube Analysis'
+
+  - task: SonarQubeAnalyze@5
+    inputs:
+      jdkversion: 'JAVA_HOME'
+    displayName: 'Run SonarQube Analysis'
+
+  - task: SonarQubePublish@5
+    inputs:
+      pollingTimeoutSec: '300'
+    displayName: 'Publish SonarQube Results'
+    
+  - script: |
+      echo "Downloading OWASP Dependency-Check..."
+      curl -L -o dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0/dependency-check-8.4.0-release.zip
+
+      echo "Extracting..."
+      powershell -Command "Expand-Archive -Path 'dependency-check.zip' -DestinationPath '.'"
+
+      echo "Renaming extracted folder..."
+      for /d %%i in (dependency-check-*) do rename "%%i" "dependency-check"
+
+      echo "Running OWASP Dependency-Check on server..."
+      dependency-check\bin\dependency-check.bat ^
+        --project "SkillSet" ^
+        --scan server ^
+        --format "HTML" ^
+        --out "owasp-report" ^
+        --enableExperimental
+    displayName: 'Run OWASP Dependency-Check (Windows)'
+
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: 'owasp-report'
+      artifact: 'OWASPReport'
+      publishLocation: 'pipeline'
+    displayName: 'Publish OWASP Dependency Report'
+    
+  - task: Docker@2
+    displayName: 'Docker Build and Push '
+    inputs:
+     containerRegistry: 'docker'  
+     repository: 'gangaraghu/devopsproject'             
+     command: 'buildAndPush'
+     Dockerfile: 'Dockerfile'                           
+     tags: |
+      $(Build.BuildId)
+      latest
