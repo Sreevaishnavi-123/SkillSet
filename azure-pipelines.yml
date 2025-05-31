@@ -43,7 +43,10 @@ steps:
         sonar.language=js
         sonar.sourceEncoding=UTF-8
         sonar.exclusions=**/node_modules/**,**/*.test.js,**/*.spec.js
+        sonar.branch.name=main
     displayName: 'Prepare SonarQube Analysis'
+   
+
 
   - task: SonarQubeAnalyze@5
     inputs:
