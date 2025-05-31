@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    networks:
+      custom_net:
+        aliases:
+          - localhost
+
+  app:
+    image: gangaraghu/devopsproject:latest
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    networks:
+      - custom_net
+
+networks:
+  custom_net:
+    driver: bridge
