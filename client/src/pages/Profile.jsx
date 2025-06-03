@@ -63,9 +63,12 @@ function Profile() {
           <h3 className="text-xl font-semibold mb-2">User Details</h3>
           <p className="text-gray-700">Email: {user.email}</p>
           <div className="mt-2">
-            <label className="block text-gray-700 font-medium">Username</label>
+            <label htmlFor="username" className="block text-gray-700 font-medium">
+              Username
+            </label>
             <div className="flex items-center space-x-2">
               <input
+                id="username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -80,12 +83,13 @@ function Profile() {
             </div>
           </div>
         </div>
+
         <h3 className="text-xl font-semibold mb-4">Your Skills</h3>
         {skills.length === 0 ? (
           <p className="text-gray-600">You haven't posted any skills yet.</p>
         ) : (
           <div className="space-y-4">
-            {skills.map(skill => (
+            {skills.map((skill) => (
               <div key={skill._id} className="bg-gray-50 p-4 rounded-lg shadow-sm">
                 <h4 className="text-lg font-semibold text-blue-800">{skill.title}</h4>
                 <p className="text-gray-600">{skill.description}</p>
