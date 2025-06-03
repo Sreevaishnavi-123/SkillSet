@@ -33,10 +33,11 @@ function Signup() {
     <div className="container mx-auto p-6">
       <h2 className="text-3xl font-bold mb-6 text-blue-600">Sign Up</h2>
       <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
-        <div className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label className="block text-gray-700 font-medium">Username</label>
+            <label htmlFor="username" className="block text-gray-700 font-medium">Username</label>
             <input
+              id="username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -45,8 +46,9 @@ function Signup() {
             />
           </div>
           <div>
-            <label className="block text-gray-700 font-medium">Email</label>
+            <label htmlFor="email" className="block text-gray-700 font-medium">Email</label>
             <input
+              id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -55,8 +57,9 @@ function Signup() {
             />
           </div>
           <div>
-            <label className="block text-gray-700 font-medium">Password</label>
+            <label htmlFor="password" className="block text-gray-700 font-medium">Password</label>
             <input
+              id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -65,12 +68,12 @@ function Signup() {
             />
           </div>
           <button
-            onClick={handleSubmit}
+            type="submit"
             className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition"
           >
             Sign Up
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );
