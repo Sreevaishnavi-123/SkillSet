@@ -1,5 +1,5 @@
 FROM node:20 AS frontend-build
-WORKDIR /app/client
+WORKDIR /app
 COPY client/package*.json ./
 RUN npm install
 COPY client/ ./
